@@ -17,15 +17,6 @@
             "minValue": 0,
             "type": "Int"
         },
-        "ExternalLBBackendAddressPoolIds": {
-            "type": "Array"
-        },
-        "ExternalLBInboundNatPoolIdsBYOL": {
-            "type": "Array"
-        },
-        "ExternalLBInboundNatPoolIdsPAYG": {
-            "type": "Array"
-        },
         "FunctionAppName": {
             "type": "String"
         },
@@ -274,39 +265,6 @@
         "cmdDeleteAll": "[concat('az account set -s ', subscription().subscriptionId, ';', variables('cmdDeleteAutoscaleSettings'), variables('cmdDeleteVMSS'))]",
         "cmdDeleteAutoscaleSettings": "[concat('az monitor autoscale delete', ' -g ', resourceGroup().name, ' -n ', variables('autoscaleSettingsNameBYOL'), ';', 'az monitor autoscale delete -g ', resourceGroup().name, ' -n ', variables('autoscaleSettingsNamePAYG'), ';')]",
         "cmdDeleteVMSS": "[concat('az vmss delete', ' -g ', resourceGroup().name,' -n ', parameters('VmssNameBYOL'), ';', 'az vmss delete -g ', resourceGroup().name,' -n ', parameters('VmssNamePAYG'), ';')]",
-        "externalLBBackendAddressPools": {
-            "copy": [
-                {
-                    "name": "externalLBBackendAddressPoolsCopyIt",
-                    "count": "[length(parameters('ExternalLBBackendAddressPoolIds'))]",
-                    "input": {
-                        "id": "[parameters('ExternalLBBackendAddressPoolIds')[copyIndex('externalLBBackendAddressPoolsCopyIt')]]"
-                    }
-                }
-            ]
-        },
-        "externlLBInboundNatPoolsBYOL": {
-            "copy": [
-                {
-                    "name": "externlLBInboundNatPoolsBYOLCopyIt",
-                    "count": "[length(parameters('ExternalLBInboundNatPoolIdsBYOL'))]",
-                    "input": {
-                        "id": "[parameters('ExternalLBInboundNatPoolIdsBYOL')[copyIndex('externlLBInboundNatPoolsBYOLCopyIt')]]"
-                    }
-                }
-            ]
-        },
-        "externlLBInboundNatPoolsPAYG": {
-            "copy": [
-                {
-                    "name": "externlLBInboundNatPoolsPAYGCopyIt",
-                    "count": "[length(parameters('ExternalLBInboundNatPoolIdsPAYG'))]",
-                    "input": {
-                        "id": "[parameters('ExternalLBInboundNatPoolIdsPAYG')[copyIndex('externlLBInboundNatPoolsPAYGCopyIt')]]"
-                    }
-                }
-            ]
-        },
         "ifBYOLOnly": "[and(not(equals(parameters('MaxBYOLInstanceCount'), 0)), not(equals(parameters('MaxBYOLInstanceCount'), 0)), equals(parameters('MinPAYGInstanceCount'), 0), equals(parameters('MaxPAYGInstanceCount'), 0))]",
         "ifPAYGOnly": "[equals(parameters('BYOLInstanceCount'), 0)]",
         "ifZoneBalanceable": "[greater(length(parameters('AvailabilityZones')), 1)]",
@@ -347,9 +305,7 @@
                         "properties": {
                             "Subnet": {
                                 "id": "[parameters('SubnetIds')[0]]"
-                            },
-                            "loadBalancerBackendAddressPools": "[createArray(variables('externalLBBackendAddressPools').externalLBBackendAddressPoolsCopyIt[0])]",
-                            "loadBalancerInboundNatPools": "[if(empty(variables('externlLBInboundNatPoolsBYOL').externlLBInboundNatPoolsBYOLCopyIt), null(), variables('externlLBInboundNatPoolsBYOL').externlLBInboundNatPoolsBYOLCopyIt)]"
+                            }
                         }
                     }
                 ]
@@ -366,9 +322,7 @@
                         "properties": {
                             "Subnet": {
                                 "id": "[parameters('SubnetIds')[0]]"
-                            },
-                            "loadBalancerBackendAddressPools": "[createArray(variables('externalLBBackendAddressPools').externalLBBackendAddressPoolsCopyIt[0])]",
-                            "loadBalancerInboundNatPools": "[if(empty(variables('externlLBInboundNatPoolsPAYG').externlLBInboundNatPoolsPAYGCopyIt), null(), variables('externlLBInboundNatPoolsPAYG').externlLBInboundNatPoolsPAYGCopyIt)]"
+                            }
                         }
                     }
                 ]
